@@ -25,7 +25,7 @@ class Orb(object):
         if _fd < 0:
             raise OpenError()
         self._fd = _fd
-        self.orbname = permissions
+        self.orbname = orbname
         self.permissions = permissions
 
     def __enter__(self):
