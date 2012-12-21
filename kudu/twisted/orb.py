@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+from twisted.internet.threads import deferToThread
+
 from kudu.exc import OrbIncomplete
 import kudu.orb
 
@@ -26,7 +28,7 @@ class Orb(kudu.orb.Orb):
         The OrbIncomplete exception is trapped and the reap is automatically
         restarted."""
         d = deferToThread(
-                super(Orb, self).orb.reap)
+                super(Orb, self).reap)
         d.addErrback(self.reap_eb)
         return d
 
@@ -36,14 +38,14 @@ class Orb(kudu.orb.Orb):
         The OrbIncomplete exception is NOT trapped, so the errback will be
         called if the reap times out, or if any other error occurs."""
         d = deferToThread(
-                super(Orb, self).orb.reap_timeout,
+                super(Orb, self).reap_timeout,
                 maxseconds)
         return d
 
     def get(self, whichpkt):
         """Returns a deferred Orb.get."""
         d = deferToThread(
-                super(Orb, self).orb.get,
+                super(Orb, self).get,
                 whichpkt)
         return d
 
