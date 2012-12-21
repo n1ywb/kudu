@@ -48,7 +48,6 @@ def orbreap_timeout(orbfd, maxseconds=0.0):
     packet = POINTER(c_char)()
     nbytes = c_int()
     bufsize = c_int(0)
-    print "Calling into c orbreap_timeout"
     r = liborb.orbreap_timeout(orbfd, maxseconds, byref(pktid), srcname, byref(pkttime),
                 byref(packet), byref(nbytes), byref(bufsize))
     if r < 0:

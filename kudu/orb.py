@@ -6,7 +6,6 @@ from kudu.exc import check_error, OrbError
 from kudu import _crap
 
 
-
 class OpenError(OrbError): pass
 class CloseError(OrbError): pass
 class SelectError(OrbError): pass
@@ -21,10 +20,6 @@ class PutXError(OrbError): pass
 class Orb(object):
     _fd = None
     def __init__(self, orbname, permissions):
-        _fd = _orb._orbopen(orbname, permissions)
-        if _fd < 0:
-            raise OpenError()
-        self._fd = _fd
         self.orbname = orbname
         self.permissions = permissions
 
@@ -33,6 +28,12 @@ class Orb(object):
 
     def __exit__(self, exc_type, exc_value, traceback):
         self.close()
+
+    def connect(self):
+        _fd = _orb._orbopen(self.orbname, self.permissions)
+        if _fd < 0:
+            raise OpenError()
+        self._fd = _fd
 
     def close(self):
         if self._fd is not None:
@@ -79,7 +80,7 @@ class Orb(object):
     def get(self, whichpkt):
         # Call our internal binding, because it releases the GIL and returns
         # the result code.
-        r, pktid, srcname, pkttime, packetstr, nbytes = _crap.get(self._fd, maxseconds)
+        r, pktid, srcname, pkttime, packetstr, nbytes = _crap.get(self._fd, whichpkt)
         check_error(r, GetError)
         return pktid, srcname, pkttime, packetstr, nbytes
 
