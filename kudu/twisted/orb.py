@@ -17,7 +17,13 @@ class Orb(kudu.orb.Orb):
     Users maybe want to use the twisted maybeDeferred to avoid having to
     remember which methods return deferreds.
     """
-    def reap_eb(self,failure):
+    def connect(self):
+        """Returns a deferred connect."""
+        d = deferToThread(
+                super(Orb, self).connect)
+        return d
+
+    def _reap_eb(self,failure):
         """Orbreap errback method."""
         failure.trap(OrbIncomplete)
         return self.reap()
@@ -29,7 +35,7 @@ class Orb(kudu.orb.Orb):
         restarted."""
         d = deferToThread(
                 super(Orb, self).reap)
-        d.addErrback(self.reap_eb)
+        d.addErrback(self._reap_eb)
         return d
 
     def reap_timeout(self, maxseconds):

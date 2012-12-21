@@ -19,7 +19,9 @@ class PutXError(OrbError): pass
 
 class Orb(object):
     _fd = None
-    def __init__(self, orbname, permissions):
+    def __init__(self, orbname, permissions, select=None, reject=None):
+        self.select_str = select
+        self.reject_str = reject
         self.orbname = orbname
         self.permissions = permissions
 
@@ -34,6 +36,10 @@ class Orb(object):
         if _fd < 0:
             raise OpenError()
         self._fd = _fd
+        if self.select_str is not None:
+            self.select(self.select_str)
+        if self.reject_str is not None:
+            self.reject(self.reject_str)
 
     def close(self):
         if self._fd is not None:
@@ -49,10 +55,12 @@ class Orb(object):
 #        pass
 
     def select(self, match):
-        return check_error(_orb._orbselect(self._fd, match), SelectError)
+        check_error(_orb._orbselect(self._fd, match), SelectError)
+        return self
 
     def reject(self, reject):
-        return check_error(_orb._orbreject(self._fd, reject), RejectError)
+        check_error(_orb._orbreject(self._fd, reject), RejectError)
+        return self
 
 #    def position(self):
 #        pass
