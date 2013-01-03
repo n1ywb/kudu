@@ -20,6 +20,8 @@ class Pkt(object):
     type = None
     version = None
     pkt_raw = None
+    pkttype = None
+    channels = None
 
     _pkttypefields = [ 'content',
                        'name',
@@ -64,24 +66,38 @@ class Pkt(object):
             if pkt is not None:
                 _pkt._freePkt(pkt)
 
-#    @classmethod
-#    def from_raw(pkt_raw):
-#        # am I supposed to unstuff this and set all my fields?
-#        self.pkt_raw = pkt_raw
-#
-#    def stuff(self):
-#        # create Packet struct HERE and ALWAYS free it
-#        # how does this report failure? I guess the only conceivable failure
-#        # mode is OOM.
-#        raise Exception("Not implemented")
-#        pkt = None
-#        try:
-#            pkt = _pkt.newPkt()
-#            # set pkt fields using raw api
-#            # stuff packet
-#            return type, packet, srcname, time
-#        finally:
-#            if pkt is not None:
-#                _pkt._freePkt(pkt)
-#
-#
+    def stuff(self):
+        # create Packet struct HERE and ALWAYS free it
+        # how does this report failure? I guess the only conceivable failure
+        # mode is OOM.
+        pkt = None
+        pfptr = None
+        try:
+            pkt = _pkt.newPkt()
+            if pkt is None:
+                raise RuntimeError("newPkt failure")
+            # set pkt fields using raw api
+            _pkt._Pkt_pkttype_set(pkt, self.pkttype['suffix'])
+            _pkt._Pkt_srcnameparts_set(pkt, *[self.srcnameparts[k] for k in
+                self._srcnamefields])
+            _pkt._Pkt.time_set(pkt, self.time)
+            # stuff packet
+            if self.pfdict is not None:
+                # make a new pf
+                pfptr = _stock.pfnew()
+                if pfptr is None:
+                    raise RuntimeError("pfnew")
+                # copy pfdict into new pf
+                # TODO this might not actually work, might have to iterate over
+                # items and put each one.
+                _stock.pfput(None, self.pfdict, pfptr)
+                # attach pfptr to pkt
+                _pkt._Pkt_pfptr_set(pkt, pfptr)
+            type, packet, srcname, time = _pkt._stuffPkt(pkt)
+            return type, packet, srcname, time
+        finally:
+            if pkt is not None:
+                _pkt._freePkt(pkt)
+            if pfptr is not None:
+                _stock.pffree(pfptr)
+
