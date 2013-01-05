@@ -17,8 +17,18 @@ class GetError(OrbError): pass
 class PutError(OrbError): pass
 class PutXError(OrbError): pass
 
+class NotConnected(OrbError): pass
+
 class Orb(object):
     _fd = None
+
+    def _connected(f):
+        def wrapper(self, *args, **kwargs):
+            if self._fd is None:
+                raise NotConnected()
+            return f(*args, **kwargs)
+        return wrapper
+
     def __init__(self, orbname, permissions, select=None, reject=None):
         self.select_str = select
         self.reject_str = reject
@@ -41,6 +51,7 @@ class Orb(object):
         if self.reject_str is not None:
             self.reject(self.reject_str)
 
+    @_connected
     def close(self):
         if self._fd is not None:
             r = _orb._orbclose(self._fd)
@@ -54,10 +65,12 @@ class Orb(object):
 #    def tell(self):
 #        pass
 
+    @_connected
     def select(self, match):
         check_error(_orb._orbselect(self._fd, match), SelectError)
         return self
 
+    @_connected
     def reject(self, reject):
         check_error(_orb._orbreject(self._fd, reject), RejectError)
         return self
@@ -65,12 +78,14 @@ class Orb(object):
 #    def position(self):
 #        pass
 
+    @_connected
     def seek(self, whichpkt):
         return check_error(_orb._orbseek(self._fd, whichpkt), SeekError)
 
 #    def after(self):
 #        pass
 
+    @_connected
     def reap(self):
         # Call our internal binding, because it releases the GIL and returns
         # the result code.
@@ -78,6 +93,7 @@ class Orb(object):
         check_error(r, ReapError)
         return pktid, srcname, pkttime, packetstr, nbytes
 
+    @_connected
     def reap_timeout(self, maxseconds):
         # Call our internal binding, because it releases the GIL and returns
         # the result code.
@@ -85,6 +101,7 @@ class Orb(object):
         check_error(r, ReapTimeoutError)
         return pktid, srcname, pkttime, packetstr, nbytes
 
+    @_connected
     def get(self, whichpkt):
         # Call our internal binding, because it releases the GIL and returns
         # the result code.
@@ -92,10 +109,12 @@ class Orb(object):
         check_error(r, GetError)
         return pktid, srcname, pkttime, packetstr, nbytes
 
+    @_connected
     def put(self, srcname, time, packet, nbytes):
         return check_error(_orb._orbput(self._fd, srcname, time, packet,
             nbytes), PutError)
 
+    @_connected
     def putx(self, srcname, time, packet, nbytes):
         return check_error(_orb._orbputx(self._fd, srcname, time, packet,
             nbytes), PutXError)
