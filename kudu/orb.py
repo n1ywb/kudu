@@ -26,7 +26,7 @@ class Orb(object):
         def wrapper(self, *args, **kwargs):
             if self._fd is None:
                 raise NotConnected()
-            return f(*args, **kwargs)
+            return f(self, *args, **kwargs)
         return wrapper
 
     def __init__(self, orbname, permissions, select=None, reject=None):
