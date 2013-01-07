@@ -22,6 +22,10 @@ class NotConnected(OrbError): pass
 class Orb(object):
     _fd = None
 
+#    def __repr__(self):
+#        return "%s(%s, %s, %s, %s)" % ("Orb", self.orbname, self.permissions,
+#                                self.select, self.reject)
+
     def _connected(f):
         def wrapper(self, *args, **kwargs):
             if self._fd is None:
