@@ -23,13 +23,13 @@ class ObservableDict(dict):
         dict, the deferred will not fire until the key is added to the dict,
         hence KeyError cannot be raised.
         """
-        d = Deferred()
-        # add d to list for that key
-        self._add_listener(key, d)
-        d.addCallback(lambda r: self[key])
+        deferred = Deferred()
+        deferred.addCallback(lambda r: self[key])
         if immediate:
-            d.callback()
-        return d
+            deferred.callback(None)
+        else:
+            self._add_listener(key, deferred)
+        return deferred
 
     def deferred_get(self, key, default=None, immediate=False):
         """Like dict.get() but returns a deferred.
@@ -42,24 +42,24 @@ class ObservableDict(dict):
         dict, the deferred will not fire until the key is added to the dict,
         hence the default value will never be returned.
         """
-        d = Deferred()
-        # add d to list for that key
-        self._add_listener(key, d)
-        d.addCallback(lambda r: super(ObservableDict, self).get(key, default))
+        deferred = Deferred()
+        deferred.addCallback(lambda r: super(ObservableDict, self).get(key, default))
         if immediate:
-            d.callback()
-        return d
+            deferred.callback(None)
+        else:
+            self._add_listener(key, deferred)
+        return deferred
 
-    def _add_listener(self, key, d):
+    def _add_listener(self, key, deferred):
         """Adds listener d to the list of listeners for key."""
-        self._listeners[key].append(d)
+        self._listeners[key].append(deferred)
 
     def __setitem__(self, key, val):
         """Like dict.__setitem__ but also notifies listeners of the change."""
         super(ObservableDict, self).__setitem__(key, val)
-        # notify listeners and reset list for k
-        listeners = self._listeners[k]
-        del self._listeners[k]
+        # notify listeners and reset list for key
+        listeners = self._listeners[key]
+        del self._listeners[key]
         for listener in listeners:
             listener.callback(val)
 
