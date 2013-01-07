@@ -17,11 +17,13 @@ class Orb(kudu.orb.Orb):
     Users maybe want to use the twisted maybeDeferred to avoid having to
     remember which methods return deferreds.
     """
-    def connect(self):
-        """Returns a deferred connect."""
-        d = deferToThread(
-                super(Orb, self).connect)
-        return d
+
+# NOTE: Async connect breaks Antelope such that it sends us corrupted packets.
+#    def connect(self):
+#        """Returns a deferred connect."""
+#        d = deferToThread(
+#                super(Orb, self).connect)
+#        return d
 
     def _reap_eb(self,failure):
         """Orbreap errback method."""
