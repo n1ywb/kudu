@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 
 from antelope import _orb
-
+from antelope._orb import ORBCURRENT, ORBPREV, ORBPREVSTASH, ORBNEXT, \
+                          ORBNEXT_WAIT, ORBOLDEST,  ORBNEWEST, ORBSTASH
 from kudu.exc import check_error, OrbError
 from kudu import _crap
 
@@ -22,6 +23,7 @@ class NotConnected(OrbError): pass
 class Orb(object):
     _fd = None
 
+# TODO For some reason this causes infinite recursion.
 #    def __repr__(self):
 #        return "%s(%s, %s, %s, %s)" % ("Orb", self.orbname, self.permissions,
 #                                self.select, self.reject)
