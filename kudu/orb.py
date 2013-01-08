@@ -3,6 +3,7 @@
 from antelope import _orb
 from antelope._orb import ORBCURRENT, ORBPREV, ORBPREVSTASH, ORBNEXT, \
                           ORBNEXT_WAIT, ORBOLDEST,  ORBNEWEST, ORBSTASH
+
 from kudu.exc import check_error, OrbError
 from kudu import _crap
 
@@ -19,6 +20,7 @@ class PutError(OrbError): pass
 class PutXError(OrbError): pass
 
 class NotConnected(OrbError): pass
+
 
 class Orb(object):
     _fd = None
