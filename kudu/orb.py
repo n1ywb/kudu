@@ -58,6 +58,7 @@ class Orb(object):
             self.select(self.select_str)
         if self.reject_str is not None:
             self.reject(self.reject_str)
+        # TODO Add after-string
 
     @_connected
     def close(self):

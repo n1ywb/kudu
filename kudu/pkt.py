@@ -59,8 +59,6 @@ class Pkt(object):
                         self.pfdict = _stock._pfget(pfptr, None)
                     finally:
                         _stock._pffree(pfptr)
-            # do we need to free the PF?
-            # will the pfptr at this layer even support a dict interface?
             self.time = time
         finally:
             if pkt is not None:
