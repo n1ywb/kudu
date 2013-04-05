@@ -2,11 +2,9 @@
 
 from twisted.internet.threads import deferToThread
 
-from kudu.exc import OrbIncomplete
-import kudu.orbreapthread
+import antelope.brttpkt
 
-
-class OrbReapThread(kudu.orbreapthread.OrbReapThread):
+class OrbReapThread(antelope.brttpkt.OrbreapThr):
     def get(self):
         d = deferToThread(
                 super(OrbReapThread, self).get)
