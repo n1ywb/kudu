@@ -1,12 +1,16 @@
 #!/usr/bin/env python
+"""
+Twisted Related Utility Code
+----------------------------
+"""
 
 from collections import defaultdict
 
 from twisted.internet.defer import Deferred
 
 class ObservableDict(dict):
-    """Like a dict, but can return deferreds which fire when a key's value
-    changes."""
+    """Subclass of dict which can return deferreds which fire when a key's
+    value changes."""
 
     def __init__(self, *args, **kwargs):
         self._listeners = defaultdict(lambda: [])
