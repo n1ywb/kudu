@@ -17,6 +17,6 @@ class OrbreapThr(antelope.brttpkt.OrbreapThr):
         :rtype: ``Deferred``
         """
         d = deferToThread(
-                super(OrbReapThread, self).get)
+                super(OrbreapThr, self).get)
         return d
 
